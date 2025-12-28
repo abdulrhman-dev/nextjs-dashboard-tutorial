@@ -22,6 +22,8 @@ const UpdateInvoice = FormSchema.omit({ id: true, date: true });
 
 export async function createInvoice(formData: FormData) {
   try {
+    console.log("CREATE INVOICE");
+
     const { customerId, amount, status } = CreateInvoice.parse({
       customerId: formData.get("customerId"),
       amount: formData.get("amount"),
@@ -35,14 +37,13 @@ export async function createInvoice(formData: FormData) {
     INSERT INTO invoices (customer_id, amount, status, date)
     VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
   `;
-
-    revalidatePath("/dashboard/invoices");
-    redirect("/dashboard/invoices");
   } catch (err) {
-    return {
-      message: "Invoice could not be created.",
-    };
+    // return {
+    //   message: "Invoice could not be created.",
+    // };
   }
+  revalidatePath("/dashboard/invoices");
+  redirect("/dashboard/invoices");
 }
 
 export async function updateInvoice(id: string, formData: FormData) {
@@ -60,31 +61,35 @@ export async function updateInvoice(id: string, formData: FormData) {
     SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status}
     WHERE id = ${id}
   `;
-
-    revalidatePath("/dashboard/invoices");
-    redirect("/dashboard/invoices");
   } catch (err) {
-    return {
-      message: "Couldn't update the invoice.",
-    };
+    // return {
+    //   message: "Couldn't update the invoice.",
+    // };
+    return;
   }
+
+  revalidatePath("/dashboard/invoices");
+  redirect("/dashboard/invoices");
 }
 
 export async function deleteInvoice(id: string) {
   try {
     await sql`DELETE FROM invoices WHERE id = ${id}`;
-    revalidatePath("/dashboard/invoices");
   } catch (err) {
     // return {
     //   message: "Couldn't delete the invoice",
     // };
+    return;
   }
+
+  revalidatePath("/dashboard/invoices");
 }
 
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData
 ) {
+  console.log("HELLO WORLD");
   try {
     await signIn("credentials", formData);
   } catch (error) {
